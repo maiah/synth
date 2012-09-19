@@ -1,7 +1,7 @@
 synth
 =====
 
-HTTP synthesizer
+Simple, fast, and efficient [Dart](http://dartlang.org) web developement framework.
 
 1. Import synth.dart
 
