@@ -3,13 +3,13 @@ synth
 
 Simple, fast, and efficient [Dart](http://dartlang.org) web developement framework.
 
-1. Import synth.dart
+Step 1: Import synth.dart
 
 ```dart
 #import('synth.dart', prefix: 'synth');
 ```
 
-2. And in your main method define your routes and start the HTTP server
+Step 2: And in your main method define your routes and start the HTTP server
 
 ```dart
 synth.get('/', (req, res)
