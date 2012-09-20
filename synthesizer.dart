@@ -13,7 +13,7 @@ void post(final path, final callback) {
   postRoutes[path] = callback;
 }
 
-Map retrieveRouteMap(final String method) {
+Map _retrieveRouteMap(final String method) {
   Map routeMap = null;
 
   switch (method) {
@@ -49,36 +49,33 @@ class SynthResponse implements HttpResponse {
 }
 
 class SynthHandler {
-  String _path;
-  var _handler;
+  String path;
+  var handler;
 
-  SynthHandler(this._path, this._handler);
-
-  String get path => _path;
-  get handler => _handler;
+  SynthHandler(this.path, this.handler);
 }
 
 class Router {
 
   static SynthHandler matchHandler(final HttpRequest req) {
     SynthHandler handler = null;
-    final Map routeMap = retrieveRouteMap(req.method);
+    final Map routeMap = _retrieveRouteMap(req.method);
     final String path = req.path;
 
     if ('/' == path) {
       handler = new SynthHandler(path, routeMap['/']);
     } else {
-      handler = matchPathToRoutes(path, routeMap);
+      handler = _matchPathToRoutes(path, routeMap);
     }
 
     return handler;
   }
 
-  static SynthHandler matchPathToRoutes(final String path, final Map routeMap) {
+  static SynthHandler _matchPathToRoutes(final String path, final Map routeMap) {
     SynthHandler handler = null;
     Collection<String> routes = routeMap.getKeys();
     for (String route in routes) {
-      bool matched = matchPathToRoute(path, route);
+      bool matched = _matchPathToRoute(path, route);
 
       if (matched) {
         handler = new SynthHandler(route, routeMap[route]);
@@ -89,12 +86,12 @@ class Router {
     return handler;
   }
 
-  static bool matchPathToRoute(String path, String route) {
+  static bool _matchPathToRoute(String path, String route) {
     bool matched = false;
 
     SynthHandler handler = null;
-    path = removeLastForwardSlashFromUrl(path);
-    route = removeLastForwardSlashFromUrl(route);
+    path = _removeLastForwardSlashFromUrl(path);
+    route = _removeLastForwardSlashFromUrl(route);
 
     List<String> pathNodes = path.split('/');
     List<String> routeNodes = route.split('/');
@@ -103,7 +100,7 @@ class Router {
       for (int i = 0; i < pathNodes.length; i++) {
         final String pathNode = pathNodes[i];
         final String routeNode = routeNodes[i];
-        matched = matchPathNodeToRouteNode(pathNode, routeNode);
+        matched = _matchPathNodeToRouteNode(pathNode, routeNode);
         if (!matched) {
           break;
         }
@@ -113,7 +110,7 @@ class Router {
     return matched;
   }
 
-  static bool matchPathNodeToRouteNode(final String pathNode, final String routeNode) {
+  static bool _matchPathNodeToRouteNode(final String pathNode, final String routeNode) {
     bool matched = false;
     if (routeNode.startsWith(':')) {
       matched = true;
@@ -126,6 +123,6 @@ class Router {
 
 }
 
-String removeLastForwardSlashFromUrl(String path) {
+String _removeLastForwardSlashFromUrl(String path) {
   return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
 }
