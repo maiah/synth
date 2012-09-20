@@ -9,7 +9,7 @@ Step 1: Import `synth.dart` library.
 #import('synth.dart');
 ```
 
-Step 2: And in your `main` method define your routes and start the HTTP server.
+Step 2: And in your `main` method define your routes and start the `HTTP` server.
 
 ```dart
 get('/', (req, res)
