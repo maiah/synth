@@ -15,11 +15,16 @@ void post(final path, final callback) {
 
 Map retrieveRouteMap(final String method) {
   Map routeMap = null;
-  if ('GET' == method) {
-    routeMap = getRoutes;
-  } else if ('POST' == method) {
-    routeMap = postRoutes;
+
+  switch (method) {
+    case 'GET':
+      routeMap = getRoutes;
+      break;
+    case 'POST':
+      routeMap = postRoutes;
+      break;
   }
+
   return routeMap;
 }
 
