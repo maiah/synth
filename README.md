@@ -15,5 +15,5 @@ Step 2: And in your `main` method define your routes and start the HTTP server.
 get('/', (req, res)
   => res.write('Hello, synthesizers!'));
 
-synth(7000);
+start(7000);
 ```
