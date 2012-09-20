@@ -14,7 +14,7 @@ Step 1: Import `synth.dart` library.
 Step 2: And in your `main` method define your routes and start the `HTTP` server.
 
 ```dart
-get('/', (req, res)
+route(GET, '/', (req, res)
   => res.write('Hello, synthesizers!'));
 
 start(7000);
