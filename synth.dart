@@ -10,24 +10,24 @@ void post(final path, final callback)
   => synthesizer.post(path, callback);
 
 void defReqHandler(final HttpRequest req, final HttpResponse res) {
-  bool found = false;
-
-  if ('GET' == req.method) {
-    synthesizer.SynthHandler synthHandler = synthesizer.Router.matchHandler(req.path);
-    found = executeHandler(synthHandler, req, res);
-  }
+  final synthesizer.SynthResponse synthRes = new synthesizer.SynthResponse(res);
+  final synthesizer.SynthHandler synthHandler = synthesizer.Router.matchHandler(req);
+  bool found = executeHandler(synthHandler, req, synthRes);
 
   if (!found) {
     def404Handler(res);
   }
 
-  res.outputStream.close();
+  if (!res.outputStream.closed) {
+    req.inputStream.onClosed =
+        () => res.outputStream.close();
+  }
 }
 
-bool executeHandler(synthesizer.SynthHandler synthHandler, final HttpRequest req, final HttpResponse res) {
+bool executeHandler(synthesizer.SynthHandler synthHandler, final HttpRequest req,
+                    final synthesizer.SynthResponse synthRes) {
   bool found = false;
   if (synthHandler != null) {
-    final synthRes = new synthesizer.SynthResponse(res);
     synthHandler.handler(req, synthRes);
     found = true;
   }

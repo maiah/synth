@@ -2,6 +2,27 @@
 
 #import('dart:io');
 
+final Map getRoutes = new Map();
+final Map postRoutes = new Map();
+
+void get(final String path, void handler(final HttpRequest req, final SynthResponse res)) {
+  getRoutes[path] = handler;
+}
+
+void post(final path, final callback) {
+  postRoutes[path] = callback;
+}
+
+Map retrieveRouteMap(final String method) {
+  Map routeMap = null;
+  if ('GET' == method) {
+    routeMap = getRoutes;
+  } else if ('POST' == method) {
+    routeMap = postRoutes;
+  }
+  return routeMap;
+}
+
 class SynthResponse implements HttpResponse {
   HttpResponse _res;
 
@@ -32,39 +53,30 @@ class SynthHandler {
   get handler => _handler;
 }
 
-final Map getRoutes = new Map();
-final Map postRoutes = new Map();
-
-void get(final String path, void handler(final HttpRequest req, final SynthResponse res)) {
-  getRoutes[path] = handler;
-}
-
-void post(final path, final callback) {
-  postRoutes[path] = callback;
-}
-
 class Router {
 
-  static SynthHandler matchHandler(final String path) {
+  static SynthHandler matchHandler(final HttpRequest req) {
     SynthHandler handler = null;
+    final Map routeMap = retrieveRouteMap(req.method);
+    final String path = req.path;
 
     if ('/' == path) {
-      handler = new SynthHandler(path, getRoutes['/']);
+      handler = new SynthHandler(path, routeMap['/']);
     } else {
-      handler = matchPathToRoutes(path);
+      handler = matchPathToRoutes(path, routeMap);
     }
 
     return handler;
   }
 
-  static SynthHandler matchPathToRoutes(final String path) {
+  static SynthHandler matchPathToRoutes(final String path, final Map routeMap) {
     SynthHandler handler = null;
-    Collection<String> routes = getRoutes.getKeys();
+    Collection<String> routes = routeMap.getKeys();
     for (String route in routes) {
       bool matched = matchPathToRoute(path, route);
 
       if (matched) {
-        handler = new SynthHandler(route, getRoutes[route]);
+        handler = new SynthHandler(route, routeMap[route]);
         break;
       }
     }
@@ -87,6 +99,9 @@ class Router {
         final String pathNode = pathNodes[i];
         final String routeNode = routeNodes[i];
         matched = matchPathNodeToRouteNode(pathNode, routeNode);
+        if (!matched) {
+          break;
+        }
       }
     }
 
