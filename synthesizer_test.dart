@@ -1,11 +1,11 @@
 #import('synthesizer.dart');
 
 main() {
-  get('/', (req, res) => res.write('This is root'));
-  get('/hey', (req, res) => res.write('yo'));
-  get('/person', (req, res) => res.write('Hello, there'));
-  get('/person/:name', (req, res) => res.write('Hello, <Name>'));
-  get('/employee/:name/department/:id', (req, res) => res.write('Hello, dept'));
+  route('GET', '/', (req, res) => res.write('This is root'));
+  route('GET', '/hey', (req, res) => res.write('yo'));
+  route('GET', '/person', (req, res) => res.write('Hello, there'));
+  route('GET', '/person/:name', (req, res) => res.write('Hello, <Name>'));
+  route('GET', '/employee/:name/department/:id', (req, res) => res.write('Hello, dept'));
 
   SynthHandler handler = Router.matchHandler('/');
   print('"/" =? "${handler.path}", handler = ${handler.handler}');

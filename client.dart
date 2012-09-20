@@ -1,20 +1,19 @@
-#import('dart:io');
 #import('synth.dart');
 
 main() {
 
-  get('/', (req, res)
+  route(GET, '/', (req, res)
       => res.write('Hello, synthesizers!'));
 
-  get('/hey', (req, res)
+  route(GET, '/hey', (req, res)
       => res.write('yo'));
 
-  get('/person/:name', (req, res) {
+  route(GET, '/person/:name', (req, res) {
     var name = req.path.split('/')[2];
     res.write('Hello, $name');
   });
 
-  get('/login', (req, res) {
+  route(GET, '/login', (req, res) {
     res.write(
         '''
         <!DOCTYPE html>
@@ -31,9 +30,12 @@ main() {
         );
   });
 
-  post('/login', (HttpRequest req, res) {
+  route(POST, '/login', (req, res) {
     req.inputStream.pipe(res.outputStream);
   });
+
+  route(GET, '/hello', (req, res)
+      => res.write('Hello, world.'));
 
   start(7000);
   print('Synthesizing on port 7000...');

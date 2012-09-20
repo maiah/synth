@@ -3,11 +3,11 @@
 #import('dart:io');
 #import('synthesizer.dart', prefix: 'synthesizer');
 
-void get(final String path, void handler(final HttpRequest req, final synthesizer.SynthResponse res))
-  => synthesizer.get(path, handler);
+const String GET = synthesizer.GET;
+const String POST = synthesizer.POST;
 
-void post(final path, final callback)
-  => synthesizer.post(path, callback);
+void route(final String method, final String path, void handler(final HttpRequest req, final synthesizer.SynthResponse res))
+  => synthesizer.route(method, path, handler);
 
 void defReqHandler(final HttpRequest req, final HttpResponse res) {
   final synthesizer.SynthResponse synthRes = new synthesizer.SynthResponse(res);

@@ -2,25 +2,32 @@
 
 #import('dart:io');
 
+const String GET = 'GET';
+const String POST = 'POST';
+
 final Map getRoutes = new Map();
 final Map postRoutes = new Map();
 
-void get(final String path, void handler(final HttpRequest req, final SynthResponse res)) {
-  getRoutes[path] = handler;
-}
-
-void post(final path, final callback) {
-  postRoutes[path] = callback;
+void route(final String method, final String path,
+           void handler(final HttpRequest req, final SynthResponse res)) {
+  switch (method) {
+    case GET:
+      getRoutes[path] = handler;
+      break;
+    case POST:
+      postRoutes[path] = handler;
+      break;
+  }
 }
 
 Map _retrieveRouteMap(final String method) {
   Map routeMap = null;
 
   switch (method) {
-    case 'GET':
+    case GET:
       routeMap = getRoutes;
       break;
-    case 'POST':
+    case POST:
       routeMap = postRoutes;
       break;
   }
