@@ -19,3 +19,5 @@ route(GET, '/', (req, res)
 
 start(7000);
 ```
+
+See [Getting Stared](https://github.com/maiah/synth/wiki/Getting-Stared) wiki page for more info.
