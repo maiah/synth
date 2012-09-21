@@ -6,37 +6,34 @@
 const String GET = synthesizer.GET;
 const String POST = synthesizer.POST;
 
-void route(final String method, final String path, void handler(final HttpRequest req, final synthesizer.SynthResponse res))
+void route(final String method, final String path,
+           void handler(final HttpRequest req,final synthesizer.Response res))
   => synthesizer.route(method, path, handler);
 
 void defReqHandler(final HttpRequest req, final HttpResponse res) {
-  final synthesizer.SynthResponse synthRes = new synthesizer.SynthResponse(res);
-  final synthesizer.SynthHandler synthHandler = synthesizer.Router.matchHandler(req);
-  bool found = executeHandler(synthHandler, req, synthRes);
+  final synthesizer.Response synthRes = new synthesizer.Response(res);
+  final synthesizer.Handler synthHandler = synthesizer.Router.matchHandler(req);
 
-  if (!found) {
-    def404Handler(res);
-  }
+  executeHandler(synthHandler, req, synthRes);
 
-  if (!res.outputStream.closed) {
+  if (!synthRes.outputStream.closed) {
     req.inputStream.onClosed =
-        () => res.outputStream.close();
+        () => synthRes.outputStream.close();
   }
 }
 
-bool executeHandler(synthesizer.SynthHandler synthHandler, final HttpRequest req,
-                    final synthesizer.SynthResponse synthRes) {
-  bool found = false;
+void executeHandler(synthesizer.Handler synthHandler, HttpRequest req,
+                    synthesizer.Response synthRes) {
   if (synthHandler != null) {
     synthHandler.handler(req, synthRes);
-    found = true;
+  } else {
+    def404Handler(synthRes);
   }
-  return found;
 }
 
-void def404Handler(final HttpResponse res) {
-  res.statusCode = HttpStatus.NOT_FOUND;
-  res.outputStream.write('Page not found.'.charCodes());
+void def404Handler(final synthesizer.Response synthRes) {
+  synthRes.statusCode = HttpStatus.NOT_FOUND;
+  synthRes.outputStream.write('Page not found.'.charCodes());
 }
 
 void start(final int port) {

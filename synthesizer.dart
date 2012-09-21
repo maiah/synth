@@ -9,7 +9,7 @@ final Map getRoutes = new Map();
 final Map postRoutes = new Map();
 
 void route(final String method, final String path,
-           void handler(final HttpRequest req, final SynthResponse res)) {
+           void handler(final HttpRequest req, final Response res)) {
   switch (method) {
     case GET:
       getRoutes[path] = handler;
@@ -35,17 +35,22 @@ Map _retrieveRouteMap(final String method) {
   return routeMap;
 }
 
-class SynthResponse implements HttpResponse {
+class Response implements HttpResponse {
   HttpResponse _res;
 
-  SynthResponse(this._res);
+  Response(this._res);
 
   void write(String content) {
     outputStream.write(content.charCodes());
   }
 
   int get contentLength => _res.contentLength;
+
   int get statusCode => _res.statusCode;
+  void set statusCode(int statusCode) {
+    _res.statusCode = statusCode;
+  }
+
   String get reasonPhrase => _res.reasonPhrase;
   bool get persistentConnection => _res.persistentConnection;
   HttpHeaders get headers => _res.headers;
@@ -55,22 +60,22 @@ class SynthResponse implements HttpResponse {
   HttpConnectionInfo get connectionInfo => _res.connectionInfo;
 }
 
-class SynthHandler {
+class Handler {
   String path;
   var handler;
 
-  SynthHandler(this.path, this.handler);
+  Handler(this.path, this.handler);
 }
 
 class Router {
 
-  static SynthHandler matchHandler(final HttpRequest req) {
-    SynthHandler handler = null;
+  static Handler matchHandler(final HttpRequest req) {
+    Handler handler = null;
     final Map routeMap = _retrieveRouteMap(req.method);
     final String path = req.path;
 
     if ('/' == path) {
-      handler = new SynthHandler(path, routeMap['/']);
+      handler = new Handler(path, routeMap['/']);
     } else {
       handler = _matchPathToRoutes(path, routeMap);
     }
@@ -78,14 +83,14 @@ class Router {
     return handler;
   }
 
-  static SynthHandler _matchPathToRoutes(final String path, final Map routeMap) {
-    SynthHandler handler = null;
+  static Handler _matchPathToRoutes(final String path, final Map routeMap) {
+    Handler handler = null;
     Collection<String> routes = routeMap.getKeys();
     for (String route in routes) {
       bool matched = _matchPathToRoute(path, route);
 
       if (matched) {
-        handler = new SynthHandler(route, routeMap[route]);
+        handler = new Handler(route, routeMap[route]);
         break;
       }
     }
@@ -96,7 +101,7 @@ class Router {
   static bool _matchPathToRoute(String path, String route) {
     bool matched = false;
 
-    SynthHandler handler = null;
+    Handler handler = null;
     path = _removeLastForwardSlashFromUrl(path);
     route = _removeLastForwardSlashFromUrl(route);
 

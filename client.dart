@@ -35,7 +35,7 @@ main() {
   });
 
   route(GET, '/hello', (req, res)
-      => res.write('Hello, world.'));
+      => res.write('Hello, World!'));
 
   start(7000);
   print('Synthesizing on port 7000...');
