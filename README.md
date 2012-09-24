@@ -1,7 +1,7 @@
 synth
 =====
 
-Simple, fast, and efficient [Dart](http://dartlang.org) web developement framework.
+Simple, minimal, and efficient [Dart](http://dartlang.org) web developement framework.
 
 Note: This is still a work in progress.
 
