@@ -12,6 +12,9 @@ class Response implements HttpResponse {
   }
 
   int get contentLength => _res.contentLength;
+  void set contentLength(int contentLength) {
+    _res.contentLength = contentLength;
+  }
 
   int get statusCode => _res.statusCode;
   void set statusCode(int statusCode) {
@@ -19,6 +22,10 @@ class Response implements HttpResponse {
   }
 
   String get reasonPhrase => _res.reasonPhrase;
+  void set reasonPhrase(String reasonPhrase) {
+    _res.reasonPhrase = reasonPhrase;
+  }
+
   bool get persistentConnection => _res.persistentConnection;
   HttpHeaders get headers => _res.headers;
   List<Cookie> get cookies => _res.cookies;
@@ -27,9 +34,7 @@ class Response implements HttpResponse {
   HttpConnectionInfo get connectionInfo => _res.connectionInfo;
 }
 
-
 class Router {
-
   static bool matchPathToRoute(final String method, String route, final String reqMethod, String reqPath) {
     bool matched = false;
 
@@ -60,12 +65,11 @@ class Router {
     if (routeNode.startsWith(':')) {
       matched = true;
     } else {
-      matched = pathNode == routeNode;
+      matched = (pathNode == routeNode);
     }
 
     return matched;
   }
-
 }
 
 String _removeLastForwardSlashFromUrl(String path) {
