@@ -2,18 +2,18 @@
 
 main() {
 
-  route(GET, '/', (req, res)
+  route('GET', '/', (req, res)
       => res.write('Hello, synthesizers!'));
 
-  route(GET, '/hey', (req, res)
+  route('GET', '/hey', (req, res)
       => res.write('yo'));
 
-  route(GET, '/person/:name', (req, res) {
+  route('GET', '/person/:name', (req, res) {
     var name = req.path.split('/')[2];
     res.write('Hello, $name');
   });
 
-  route(GET, '/login', (req, res) {
+  route('GET', '/login', (req, res) {
     res.write(
         '''
         <!DOCTYPE html>
@@ -30,11 +30,11 @@ main() {
         );
   });
 
-  route(POST, '/login', (req, res) {
+  route('POST', '/login', (req, res) {
     req.inputStream.pipe(res.outputStream);
   });
 
-  route(GET, '/hello', (req, res)
+  route('GET', '/hello', (req, res)
       => res.write('Hello, World!'));
 
   start(7000);

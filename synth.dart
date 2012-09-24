@@ -3,41 +3,34 @@
 #import('dart:io');
 #import('synthesizer.dart', prefix: 'synthesizer');
 
-const String GET = synthesizer.GET;
-const String POST = synthesizer.POST;
-
-void route(final String method, final String path,
-           void handler(final HttpRequest req,final synthesizer.Response res))
-  => synthesizer.route(method, path, handler);
+final HttpServer _server = new HttpServer();
 
 void start(final int port) {
-  final server = new HttpServer();
-  server.listen('127.0.0.1', port);
-  server.defaultRequestHandler = _defReqHandler;
+  _server.defaultRequestHandler = (final HttpRequest req, final HttpResponse res) {
+    res.statusCode = HttpStatus.NOT_FOUND;
+    res.headers.set(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
+    res.outputStream.write('${res.statusCode} Page not found.'.charCodes());
+    res.outputStream.close();
+  };
+  _server.listen('127.0.0.1', port);
 }
 
-void _defReqHandler(final HttpRequest req, final HttpResponse res) {
-  final synthesizer.Response synthRes = new synthesizer.Response(res);
-  final synthesizer.Handler synthHandler = synthesizer.Router.matchHandler(req);
-
-  _executeHandler(synthHandler, req, synthRes);
-
-  if (!synthRes.outputStream.closed) {
-    req.inputStream.onClosed =
-        () => synthRes.outputStream.close();
-  }
+void route(final String method, final String pathRoute,
+           void handler(final HttpRequest req, final synthesizer.Response res)) {
+  Function synthHandler = createSynthHandler(handler);
+  _server.addRequestHandler((HttpRequest req) {
+    return synthesizer.Router.matchPathToRoute(method, pathRoute, req.method, req.path);
+  }, synthHandler);
 }
 
-void _executeHandler(synthesizer.Handler synthHandler, HttpRequest req,
-                    synthesizer.Response synthRes) {
-  if (synthHandler != null) {
-    synthHandler.handler(req, synthRes);
-  } else {
-    _def404Handler(synthRes);
-  }
-}
+Function createSynthHandler(void handler(final HttpRequest req, final HttpResponse res)) {
+  return (final HttpRequest req, final HttpResponse res) {
+    synthesizer.Response synthRes = new synthesizer.Response(res);
+    handler(req, synthRes);
 
-void _def404Handler(final synthesizer.Response synthRes) {
-  synthRes.statusCode = HttpStatus.NOT_FOUND;
-  synthRes.outputStream.write('Page not found.'.charCodes());
+    if (!synthRes.outputStream.closed) {
+      req.inputStream.onClosed =
+          () => synthRes.outputStream.close();
+    }
+  };
 }

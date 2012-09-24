@@ -2,39 +2,6 @@
 
 #import('dart:io');
 
-const String GET = 'GET';
-const String POST = 'POST';
-
-final Map getRoutes = new Map();
-final Map postRoutes = new Map();
-
-void route(final String method, final String path,
-           void handler(final HttpRequest req, final Response res)) {
-  switch (method) {
-    case GET:
-      getRoutes[path] = handler;
-      break;
-    case POST:
-      postRoutes[path] = handler;
-      break;
-  }
-}
-
-Map _retrieveRouteMap(final String method) {
-  Map routeMap = null;
-
-  switch (method) {
-    case GET:
-      routeMap = getRoutes;
-      break;
-    case POST:
-      routeMap = postRoutes;
-      break;
-  }
-
-  return routeMap;
-}
-
 class Response implements HttpResponse {
   HttpResponse _res;
 
@@ -60,61 +27,27 @@ class Response implements HttpResponse {
   HttpConnectionInfo get connectionInfo => _res.connectionInfo;
 }
 
-class Handler {
-  String path;
-  var handler;
-
-  Handler(this.path, this.handler);
-}
 
 class Router {
 
-  static Handler matchHandler(final HttpRequest req) {
-    Handler handler = null;
-    final Map routeMap = _retrieveRouteMap(req.method);
-    final String path = req.path;
-
-    if ('/' == path) {
-      handler = new Handler(path, routeMap['/']);
-    } else {
-      handler = _matchPathToRoutes(path, routeMap);
-    }
-
-    return handler;
-  }
-
-  static Handler _matchPathToRoutes(final String path, final Map routeMap) {
-    Handler handler = null;
-    Collection<String> routes = routeMap.getKeys();
-    for (String route in routes) {
-      bool matched = _matchPathToRoute(path, route);
-
-      if (matched) {
-        handler = new Handler(route, routeMap[route]);
-        break;
-      }
-    }
-
-    return handler;
-  }
-
-  static bool _matchPathToRoute(String path, String route) {
+  static bool matchPathToRoute(final String method, String route, final String reqMethod, String reqPath) {
     bool matched = false;
 
-    Handler handler = null;
-    path = _removeLastForwardSlashFromUrl(path);
-    route = _removeLastForwardSlashFromUrl(route);
-
-    List<String> pathNodes = path.split('/');
-    List<String> routeNodes = route.split('/');
-
-    if (pathNodes.length == routeNodes.length) {
-      for (int i = 0; i < pathNodes.length; i++) {
-        final String pathNode = pathNodes[i];
-        final String routeNode = routeNodes[i];
-        matched = _matchPathNodeToRouteNode(pathNode, routeNode);
-        if (!matched) {
-          break;
+    if (method == reqMethod) {
+      reqPath = _removeLastForwardSlashFromUrl(reqPath);
+      route = _removeLastForwardSlashFromUrl(route);
+  
+      List<String> pathNodes = reqPath.split('/');
+      List<String> routeNodes = route.split('/');
+  
+      if (pathNodes.length == routeNodes.length) {
+        for (int i = 0; i < pathNodes.length; i++) {
+          final String pathNode = pathNodes[i];
+          final String routeNode = routeNodes[i];
+          matched = _matchPathNodeToRouteNode(pathNode, routeNode);
+          if (!matched) {
+            break;
+          }
         }
       }
     }
