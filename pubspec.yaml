@@ -1,0 +1,6 @@
+name: synth
+version: 0.0.1
+description: >
+  Simple, minimal, and efficient Dart web developement framework.
+author: Jeremiah John M. Macariola <jjmmacariola@gmail.com>
+homepage: https://github.com/maiah/synth

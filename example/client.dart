@@ -1,4 +1,4 @@
-#import('synth.dart');
+#import('../lib/synth.dart');
 
 main() {
 
@@ -38,6 +38,6 @@ main() {
       => res.write('Hello, World!'));
 
   start(7000);
-  print('Synthesizing on port 7000...');
+  print('Listening on port 7000...');
 
 }

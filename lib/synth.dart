@@ -1,17 +1,17 @@
 #library('synth');
 
 #import('dart:io');
-#import('synthesizer.dart', prefix: 'synthesizer');
+#source('./src/synthesizer.dart');
 
 const String HOST = '127.0.0.1';
 
 final HttpServer _server = new HttpServer();
 
 void route(final String method, final String pathRoute,
-           void handler(final HttpRequest req, final synthesizer.Response res)) {
+           void handler(final HttpRequest req, final Response res)) {
   Function synthHandler = createHandler(handler);
   _server.addRequestHandler((HttpRequest req) {
-    return synthesizer.Router.matchPathToRoute(method, pathRoute, req.method, req.path);
+    return Router.matchPathToRoute(method, pathRoute, req.method, req.path);
   }, synthHandler);
 }
 
@@ -22,7 +22,7 @@ void start(final int port) {
 
 Function createHandler(void handler(final HttpRequest req, final HttpResponse res)) {
   return (final HttpRequest req, final HttpResponse res) {
-    synthesizer.Response synthRes = new synthesizer.Response(res);
+    Response synthRes = new Response(res);
     handler(req, synthRes);
 
     if (!synthRes.outputStream.closed) {

@@ -1,4 +1,4 @@
-#import('synthesizer.dart');
+#import('../lib/src/synthesizer.dart');
 
 main() {
   bool isMatched = Router.matchPathToRoute('GET', '/', 'GET', '/');
@@ -17,7 +17,7 @@ main() {
   assert(true, isMatched);
 
   isMatched = Router.matchPathToRoute('GET', '/book/:id', 'GET', '/book');
-  assert(true, isMatched);
+  assert(false, isMatched);
 }
 
 assert(var expected, var result) {

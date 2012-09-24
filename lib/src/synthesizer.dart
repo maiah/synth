@@ -1,7 +1,3 @@
-#library('synthesizer');
-
-#import('dart:io');
-
 class Response implements HttpResponse {
   HttpResponse _res;
 
