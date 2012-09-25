@@ -19,7 +19,7 @@ dependencies:
     git: git://github.com/maiah/synth.git
 ```
 
-Step 3: Inside `hello` directory execute `pub install`. This will create `packages` folder and download the `synth` library on it.
+Step 3: Inside `hello` directory execute `pub install`. This will create `packages` folder and download the `synth` library.
 ```sh
 $ pub install
 ```
