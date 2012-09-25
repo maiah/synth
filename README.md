@@ -3,6 +3,8 @@ synth
 
 Simple, minimal, and efficient [Dart](http://dartlang.org) web developement framework.
 
+Prerequisite: [Dart](http://www.dartlang.org/downloads.html) installed in your machine.
+
 Step 1: Create a project using [Dart IDE](http://www.dartlang.org/docs/editor/) or commandline. Instructions below is thru commandline.
 ```sh
 $ mkdir hello
@@ -17,7 +19,7 @@ dependencies:
     git: git://github.com/maiah/synth.git
 ```
 
-Step 3: Inside `hello` directory execute `pub install` to add the `synth` library into your project.
+Step 3: Inside `hello` directory execute `pub install`. This will create `packages` folder and download the `synth` library on it.
 ```sh
 $ pub install
 ```
