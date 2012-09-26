@@ -2,6 +2,11 @@
 
 main() {
 
+  use((req, res) {
+    print('This is a middleware.');
+    return true;
+  });
+
   route('GET', '/', (req, res)
       => res.write('Hello, synthesizers!'));
 

@@ -2,9 +2,15 @@
 
 #import('dart:io');
 
+// Typesdefs
+typedef bool Middleware(HttpRequest req, Response res);
+
+// Constants
 const String HOST = '127.0.0.1';
 
+// Private variables
 final HttpServer _server = new HttpServer();
+List<Middleware> _middlewares = new List<Middleware>();
 
 void route(final String method, final String pathRoute,
            void handler(final HttpRequest req, final Response res)) {
@@ -19,10 +25,28 @@ void start(final int port) {
   _server.listen(HOST, port);
 }
 
+void use(Middleware middleware) {
+  _middlewares.add(middleware);
+}
+
 Function createHandler(void handler(final HttpRequest req, final HttpResponse res)) {
   return (final HttpRequest req, final HttpResponse res) {
+    // Create enhanced Response object.
     Response synthRes = new Response(res);
-    handler(req, synthRes);
+
+    // Execute middlewares if any.
+    bool executeNext = false;
+    for (Middleware middleware in _middlewares) {
+      executeNext = middleware(req, synthRes);
+      if (!executeNext) {
+        break;
+      }
+    }
+
+    // Finally execute user handler.
+    if (executeNext) {
+      handler(req, synthRes);
+    }
 
     if (!synthRes.outputStream.closed) {
       req.inputStream.onClosed =
@@ -77,10 +101,10 @@ class Router {
     if (method == reqMethod) {
       reqPath = _removeLastForwardSlashFromUrl(reqPath);
       route = _removeLastForwardSlashFromUrl(route);
-  
+
       List<String> pathNodes = reqPath.split('/');
       List<String> routeNodes = route.split('/');
-  
+
       if (pathNodes.length == routeNodes.length) {
         for (int i = 0; i < pathNodes.length; i++) {
           final String pathNode = pathNodes[i];
@@ -106,8 +130,8 @@ class Router {
 
     return matched;
   }
-}
 
-String _removeLastForwardSlashFromUrl(String path) {
-  return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
+  static String _removeLastForwardSlashFromUrl(String path) {
+    return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
+  }
 }
