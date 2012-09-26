@@ -1,3 +1,5 @@
+![synth!](http://kabiscube.deviantart.com/art/Synth-Robot-Boy-187145251)
+
 synth
 =====
 
