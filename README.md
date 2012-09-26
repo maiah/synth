@@ -1,4 +1,4 @@
-![synth!](http://kabiscube.deviantart.com/art/Synth-Robot-Boy-187145251)
+![synth!](https://raw.github.com/maiah/synth/master/resources/synth_logo.png)
 
 synth
 =====
