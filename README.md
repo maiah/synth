@@ -47,7 +47,7 @@ Step 6: Run your Dart program using Dart IDE or commandline. Instructions below 
 $ dart hello_server.dart
 ```
 
-Step 7: Open your web browser and go to `http://localhost:7000` and the message below will be shown.
+Step 7: Open your web browser and go to [http://localhost:7000](http://localhost:7000) and the message below will be shown.
 ```
 Hello, World!
 ```
