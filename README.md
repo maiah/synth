@@ -26,7 +26,7 @@ $ pub install
 
 Step 4: Create `hello_server.dart` file inside `hello` folder and import `synth.dart` library in that file.
 ```dart
-#import('package:synth/lib/synth.dart');
+#import('package:synth/synth.dart');
 ```
 
 Step 5: And also in this file create `main` method and define your routes and start the `HTTP` server.
@@ -49,5 +49,3 @@ Step 7: Open your web browser and go to `http://localhost:7000` and the message 
 ```
 Hello, World!
 ```
-
-See [Getting Stared](https://github.com/maiah/synth/wiki/Getting-Stared) wiki page for more info.
