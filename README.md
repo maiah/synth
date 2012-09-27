@@ -1,3 +1,5 @@
+![synth!](https://raw.github.com/maiah/synth/master/resources/synth_logo.png)
+
 synth
 =====
 

@@ -4,17 +4,18 @@
 
 // Typesdefs
 typedef bool Middleware(HttpRequest req, Response res);
+typedef void Handler(HttpRequest req, HttpResponse res);
 
 // Constants
 const String HOST = '127.0.0.1';
 
 // Private variables
 final HttpServer _server = new HttpServer();
-List<Middleware> _middlewares = new List<Middleware>();
+final List<Middleware> _middlewares = new List<Middleware>();
 
 void route(final String method, final String pathRoute,
            void handler(final HttpRequest req, final Response res)) {
-  Function synthHandler = createHandler(handler);
+  Handler synthHandler = createHandler(handler);
   _server.addRequestHandler((HttpRequest req) {
     return Router.matchPathToRoute(method, pathRoute, req.method, req.path);
   }, synthHandler);
@@ -29,7 +30,7 @@ void use(Middleware middleware) {
   _middlewares.add(middleware);
 }
 
-Function createHandler(void handler(final HttpRequest req, final HttpResponse res)) {
+Handler createHandler(void handler(final HttpRequest req, final HttpResponse res)) {
   return (final HttpRequest req, final HttpResponse res) {
     // Create enhanced Response object.
     Response synthRes = new Response(res);
@@ -48,6 +49,7 @@ Function createHandler(void handler(final HttpRequest req, final HttpResponse re
       handler(req, synthRes);
     }
 
+    // Close response stream if needed.
     if (!synthRes.outputStream.closed) {
       req.inputStream.onClosed =
           () => synthRes.outputStream.close();
