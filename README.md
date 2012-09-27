@@ -51,3 +51,5 @@ Step 7: Open your web browser and go to [http://localhost:7000](http://localhost
 ```
 Hello, World!
 ```
+
+Cool synth art by [KabisCube](http://kabiscube.deviantart.com/) `kabiscube@yahoo.com`
