@@ -75,4 +75,4 @@ use((req, res) {
 
 The code above will register the middleware handler closure you created and will execute everytime a request is processed.
 
-Cool synth art by [KabisCube](http://kabiscube.deviantart.com/) `kabiscube@yahoo.com`
+Synth Robot Boy art by [KabisCube](http://kabiscube.deviantart.com/) `kabiscube@yahoo.com`
