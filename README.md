@@ -5,7 +5,7 @@ synth
 
 Simple, minimal, and efficient [Dart](http://dartlang.org) web developement framework.
 
-Prerequisite: [Dart](http://www.dartlang.org/downloads.html) installed in your machine.
+Prerequisite: [Dart](http://www.dartlang.org/downloads.html) and [Git](https://help.github.com/articles/set-up-git) installed in your machine.
 
 Basic usage
 ===========
