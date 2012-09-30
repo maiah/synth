@@ -3,9 +3,11 @@
 main() {
 
   use((req, res) {
-    print('This is a middleware.');
+    //print('This is a middleware.');
     return true;
   });
+
+  use(reqContent);
 
   route('GET', '/', (req, res)
       => res.write('Hello, synthesizers!'));
@@ -36,7 +38,8 @@ main() {
   });
 
   route('POST', '/login', (req, res) {
-    req.inputStream.pipe(res.outputStream);
+    //req.inputStream.pipe(res.outputStream);
+    res.write('Hello login');
   });
 
   route('GET', '/hello', (req, res)

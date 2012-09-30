@@ -22,7 +22,7 @@ void route(final String method, final String pathRoute,
 }
 
 void start(final int port) {
-  _server.defaultRequestHandler = defaultReqHandler;
+  _server.defaultRequestHandler = _defaultReqHandler;
   _server.listen(HOST, port);
 }
 
@@ -34,6 +34,7 @@ Handler createHandler(void handler(final HttpRequest req, final HttpResponse res
   return (final HttpRequest req, final HttpResponse res) {
     // Create enhanced Response object.
     Response synthRes = new Response(res);
+
 
     // Execute middlewares if any.
     bool executeNext = false;
@@ -57,7 +58,7 @@ Handler createHandler(void handler(final HttpRequest req, final HttpResponse res
   };
 }
 
-void defaultReqHandler(final HttpRequest req, final HttpResponse res) {
+void _defaultReqHandler(final HttpRequest req, final HttpResponse res) {
   res.statusCode = HttpStatus.NOT_FOUND;
   res.headers.set(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
   res.outputStream.write('${res.statusCode} Page not found.'.charCodes());
@@ -101,8 +102,8 @@ class Router {
     bool matched = false;
 
     if (method == reqMethod) {
-      reqPath = _removeLastForwardSlashFromUrl(reqPath);
-      route = _removeLastForwardSlashFromUrl(route);
+      reqPath = _removeLastForwardSlashFromPath(reqPath);
+      route = _removeLastForwardSlashFromPath(route);
 
       List<String> pathNodes = reqPath.split('/');
       List<String> routeNodes = route.split('/');
@@ -132,8 +133,51 @@ class Router {
 
     return matched;
   }
+}
 
-  static String _removeLastForwardSlashFromUrl(String path) {
-    return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
+// Utils
+String _removeLastForwardSlashFromPath(String path) {
+  return path.length > 1 && path.endsWith('/') ? path.substring(0, path.length - 1) : path;
+}
+
+
+// Middlewares
+
+/** Middlware for logging request path and its query parameters. */
+bool logPath(HttpRequest req, Response res) {
+  final String path = _removeLastForwardSlashFromPath(req.path);
+  String params = 'no';
+
+  if (req.queryParameters.length > 0) {
+    params = req.queryParameters.toString();
   }
+
+  print('Request path ${path} with $params parameters');
+  return true;
+}
+
+Map<String, String> dataMap = new Map<String, String>();
+
+/** Middleware for parsing the request post data. */
+bool reqContent(HttpRequest req, Response res) {
+  final List<int> data = new List<int>();
+
+  req.inputStream.onData = () {
+    data.addAll(req.inputStream.read());
+    String dataString = new String.fromCharCodes(data);
+    print(dataString);
+
+    final List<String> keysValues = dataString.split('&');
+    for (String kv in keysValues) {
+      List<String> kvs = kv.split('=');
+
+      final String key = kvs[0];
+      final String val = kvs[1];
+      dataMap[key] = val;
+    }
+
+    print('Map is ${dataMap}');
+  };
+
+  return true;
 }
