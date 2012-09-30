@@ -5,7 +5,10 @@ synth
 
 Simple, minimal, and efficient [Dart](http://dartlang.org) web developement framework.
 
-Prerequisite: [Dart](http://www.dartlang.org/downloads.html) installed in your machine.
+Prerequisite: [Dart](http://www.dartlang.org/downloads.html) and [Git](https://help.github.com/articles/set-up-git) installed in your machine.
+
+Basic usage
+===========
 
 Step 1: Create a project using [Dart IDE](http://www.dartlang.org/docs/editor/) or commandline. Instructions below is thru commandline.
 ```sh
@@ -51,3 +54,25 @@ Step 7: Open your web browser and go to [http://localhost:7000](http://localhost
 ```
 Hello, World!
 ```
+
+Adding middleware
+=================
+
+Adding middleware is very simple. It's like providing a HTTP request handler. But you have to register your middleware using the `use` method.
+
+Unlike request handler, middlewares must have a `bool` return value. Take a look at the typedef Middleware signature below:
+```dart
+typedef bool Middleware(HttpRequest req, Response res);
+```
+
+For example you want to add a middleware that will log the request path each time a request is processed.
+```dart
+use((req, res) {
+  print('Request path is ${req.path}');
+  return true;
+});
+```
+
+The code above will register the middleware handler closure you created and will execute everytime a request is processed.
+
+Synth Robot Boy art by [KabisCube](http://kabiscube.deviantart.com/) `kabiscube@yahoo.com`
