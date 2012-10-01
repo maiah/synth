@@ -75,4 +75,9 @@ use((req, res) {
 
 The code above will register the middleware handler closure you created and will execute everytime a request is processed.
 
+### Built-in middlewares
+
+* `logPath` - Used for logging the Request path and its query parameters.
+* `reqContent` - Used to gather Request POST data and populate `Request`#`dataMap` property.
+
 Synth Robot Boy art by [KabisCube](http://kabiscube.deviantart.com/) `kabiscube@yahoo.com`
