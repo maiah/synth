@@ -62,7 +62,7 @@ Adding middleware is very simple. It's like providing a HTTP request handler. Bu
 
 Unlike request handler, middlewares must have a `bool` return value. Take a look at the typedef Middleware signature below:
 ```dart
-typedef bool Middleware(HttpRequest req, Response res);
+typedef bool Middleware(Request req, Response res);
 ```
 
 For example you want to add a middleware that will log the request path each time a request is processed.
