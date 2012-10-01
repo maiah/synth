@@ -78,6 +78,6 @@ The code above will register the middleware handler closure you created and will
 ### Built-in middlewares
 
 * `logPath` - Used for logging the Request path and its query parameters.
-* `reqContent` - Used to gather Request POST data and populate `Request`#`dataMap` property.
+* `reqContent` - Used to gather Request POST data and populate `Request`#`dataMap` property which can be accessed by user-defined request handlers.
 
 Synth Robot Boy art by [KabisCube](http://kabiscube.deviantart.com/) `kabiscube@yahoo.com`
