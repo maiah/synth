@@ -45,16 +45,19 @@ Handler createHandler(void handler(final HttpRequest req, final HttpResponse res
       }
     }
 
-    // Finally execute user handler.
-    if (executeNext) {
-      handler(req, synthRes);
-    }
+    req.inputStream.onClosed = () {
 
-    // Close response stream if needed.
-    if (!synthRes.outputStream.closed) {
-      req.inputStream.onClosed =
-          () => synthRes.outputStream.close();
-    }
+      // Finally execute user handler.
+      if (executeNext) {
+        handler(req, synthRes);
+      }
+
+      // Close response stream if needed.
+      if (!synthRes.outputStream.closed) {
+        synthRes.outputStream.close();
+      }
+    };
+
   };
 }
 
@@ -165,7 +168,6 @@ bool reqContent(HttpRequest req, Response res) {
   req.inputStream.onData = () {
     data.addAll(req.inputStream.read());
     String dataString = new String.fromCharCodes(data);
-    print(dataString);
 
     final List<String> keysValues = dataString.split('&');
     for (String kv in keysValues) {
@@ -175,8 +177,6 @@ bool reqContent(HttpRequest req, Response res) {
       final String val = kvs[1];
       dataMap[key] = val;
     }
-
-    print('Map is ${dataMap}');
   };
 
   return true;

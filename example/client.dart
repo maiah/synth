@@ -3,7 +3,7 @@
 main() {
 
   use((req, res) {
-    //print('This is a middleware.');
+    print('This is a middleware.');
     return true;
   });
 
@@ -38,8 +38,7 @@ main() {
   });
 
   route('POST', '/login', (req, res) {
-    //req.inputStream.pipe(res.outputStream);
-    res.write('Hello login');
+    res.write("Hello ${dataMap['username']}");
   });
 
   route('GET', '/hello', (req, res)
