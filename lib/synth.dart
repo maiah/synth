@@ -3,8 +3,8 @@
 #import('dart:io');
 
 // Typesdefs
-typedef bool Middleware(HttpRequest req, Response res);
-typedef void Handler(HttpRequest req, HttpResponse res);
+typedef bool Middleware(Request req, Response res);
+typedef void Handler(Request req, Response res);
 
 // Constants
 const String HOST = '127.0.0.1';
@@ -14,7 +14,7 @@ final HttpServer _server = new HttpServer();
 final List<Middleware> _middlewares = new List<Middleware>();
 
 void route(final String method, final String pathRoute,
-           void handler(final HttpRequest req, final Response res)) {
+           void handler(final Request req, final Response res)) {
   Handler synthHandler = createHandler(handler);
   _server.addRequestHandler((HttpRequest req) {
     return Router.matchPathToRoute(method, pathRoute, req.method, req.path);
@@ -30,26 +30,27 @@ void use(Middleware middleware) {
   _middlewares.add(middleware);
 }
 
-Handler createHandler(void handler(final HttpRequest req, final HttpResponse res)) {
+Handler createHandler(void handler(final Request req, final Response res)) {
   return (final HttpRequest req, final HttpResponse res) {
-    // Create enhanced Response object.
+    // Create enhanced Request and Response object.
+    Request synthReq = new Request(req);
     Response synthRes = new Response(res);
 
 
     // Execute middlewares if any.
     bool executeNext = false;
     for (Middleware middleware in _middlewares) {
-      executeNext = middleware(req, synthRes);
+      executeNext = middleware(synthReq, synthRes);
       if (!executeNext) {
         break;
       }
     }
 
-    req.inputStream.onClosed = () {
+    synthReq.inputStream.onClosed = () {
 
       // Finally execute user handler.
       if (executeNext) {
-        handler(req, synthRes);
+        handler(synthReq, synthRes);
       }
 
       // Close response stream if needed.
@@ -68,6 +69,31 @@ void _defaultReqHandler(final HttpRequest req, final HttpResponse res) {
   res.outputStream.close();
 }
 
+/** Enhanced Request object. */
+class Request implements HttpRequest {
+  HttpRequest _req;
+  final Map<String, String> _dataMap = new Map<String, String>();
+
+  Request(this._req);
+
+  Map<String, String> get dataMap => _dataMap;
+
+  int get contentLength => _req.contentLength;
+
+  bool get persistentConnection => _req.persistentConnection;
+  String get method => _req.method;
+  String get uri => _req.uri;
+  String get path => _req.path;
+  String get queryString => _req.queryString;
+  Map<String, String> get queryParameters => _req.queryParameters;
+  HttpHeaders get headers => _req.headers;
+  List<Cookie> get cookies => _req.cookies;
+  InputStream get inputStream => _req.inputStream;
+  String get protocolVersion => _req.protocolVersion;
+  HttpConnectionInfo get connectionInfo => _req.connectionInfo;
+}
+
+/** Enahnced Response object. */
 class Response implements HttpResponse {
   HttpResponse _res;
 
@@ -147,7 +173,7 @@ String _removeLastForwardSlashFromPath(String path) {
 // Middlewares
 
 /** Middlware for logging request path and its query parameters. */
-bool logPath(HttpRequest req, Response res) {
+bool logPath(Request req, Response res) {
   final String path = _removeLastForwardSlashFromPath(req.path);
   String params = 'no';
 
@@ -159,10 +185,8 @@ bool logPath(HttpRequest req, Response res) {
   return true;
 }
 
-Map<String, String> dataMap = new Map<String, String>();
-
 /** Middleware for parsing the request post data. */
-bool reqContent(HttpRequest req, Response res) {
+bool reqContent(Request req, Response res) {
   final List<int> data = new List<int>();
 
   req.inputStream.onData = () {
@@ -175,7 +199,7 @@ bool reqContent(HttpRequest req, Response res) {
 
       final String key = kvs[0];
       final String val = kvs[1];
-      dataMap[key] = val;
+      req.dataMap[key] = val;
     }
   };
 

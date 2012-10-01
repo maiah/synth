@@ -38,7 +38,7 @@ main() {
   });
 
   route('POST', '/login', (req, res) {
-    res.write("Hello ${dataMap['username']}");
+    res.write("Hello ${req.dataMap['username']}");
   });
 
   route('GET', '/hello', (req, res)
