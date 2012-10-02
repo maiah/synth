@@ -1,5 +1,8 @@
 // Middleware collection.
 
+/** Middleware method signature. */
+typedef bool Middleware(Request req, Response res);
+
 /** Middlware for logging request path and its query parameters. */
 bool logPath(Request req, Response res) {
   final String path = _removeLastForwardSlashFromPath(req.path);

@@ -1,5 +1,11 @@
 // Enhanced HTTP objects.
 
+/** Dart's default HTTP handler method signature. */
+typedef void HttpHandler(HttpRequest req, HttpResponse res);
+
+/** Synth's enhanced handler method signature. */
+typedef void Handler(Request req, Response res);
+
 /** Enhanced Request object. */
 class Request implements HttpRequest {
   final HttpRequest _req;
@@ -62,16 +68,115 @@ class Response implements HttpResponse {
   HttpConnectionInfo get connectionInfo => _res.connectionInfo;
 }
 
+/** Enhanced Server object. */
+class Server implements HttpServer {
+  HttpServer _server;
+  final List<Middleware> _middlewares = new List<Middleware>();
+
+  Server(this._server) {
+    _server.defaultRequestHandler = _defaultReqHandler;
+  }
+
+  void _defaultReqHandler(final HttpRequest req, final HttpResponse res) {
+    res.statusCode = HttpStatus.NOT_FOUND;
+    res.headers.set(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
+    res.outputStream.write('${res.statusCode} Page not found.'.charCodes());
+    res.outputStream.close();
+  }
+
+  HttpHandler createHandler(Middleware routeMiddleware, Handler handler) {
+    return (final HttpRequest req, final HttpResponse res) {
+      // Create enhanced Request and Response object.
+      final Request synthReq = new Request(req);
+      final Response synthRes = new Response(res);
+
+
+      // Execute middlewares if any.
+      bool executeNext = false;
+      for (Middleware middleware in _middlewares) {
+        executeNext = middleware(synthReq, synthRes);
+        if (!executeNext) {
+          break;
+        }
+      }
+
+      synthReq.inputStream.onClosed = () {
+        // Execute route middleware.
+        if (executeNext && routeMiddleware != null) {
+          executeNext = routeMiddleware(synthReq, synthRes);
+        }
+
+        // Finally execute user handler.
+        if (executeNext) {
+          handler(synthReq, synthRes);
+        }
+
+        // Close response stream if needed.
+        if (!synthRes.outputStream.closed) {
+          synthRes.outputStream.close();
+        }
+      };
+
+    };
+  }
+
+  void addMiddleware(Middleware middleware) {
+    _middlewares.add(middleware);
+  }
+
+  void listen(String host, int port, [int backlog]) => _server.listen(host, port);
+  void listenOn(ServerSocket serverSocket) => _server.listenOn(serverSocket);
+  addRequestHandler(bool matcher(HttpRequest request),
+                    void handler(HttpRequest request, HttpResponse response))
+                    => _server.addRequestHandler(matcher, handler);
+  void set defaultRequestHandler(
+      void handler(HttpRequest request, HttpResponse response)) {
+    _server.defaultRequestHandler = handler;
+  }
+  void close() => _server.close();
+  int get port => _server.port;
+  void set onError(void callback(e)) {
+    _server.onError = callback;
+  }
+}
+
+class Route {
+  String _method;
+  String _path;
+  Middleware _middleware;
+  Handler _handler;
+
+  Route(this._method, this._path, this._middleware, this._handler);
+
+  String get method => _method;
+  String get path => _path;
+  Handler get handler => _handler;
+  Middleware get middleware => _middleware;
+}
+
 class Router {
-  static bool matchPathToRoute(final String method, String route, final String reqMethod, String reqPath) {
+  void addRoute(Server server, Route route) {
+    HttpHandler httpHandler = server.createHandler(route.middleware, route.handler);
+    server.addRequestHandler((HttpRequest req) {
+      return _matchPathToRoute(req, route);
+    }, httpHandler);
+  }
+
+  bool _matchPathToRoute(final HttpRequest req, final Route route) {
     bool matched = false;
 
-    if (method == reqMethod) {
+    final String routeMethod = route.method;
+    String routePath = route.path;
+
+    final String reqMethod = req.method;
+    String reqPath = req.path;
+
+    if (routeMethod == reqMethod) {
       reqPath = _removeLastForwardSlashFromPath(reqPath);
-      route = _removeLastForwardSlashFromPath(route);
+      routePath = _removeLastForwardSlashFromPath(routePath);
 
       List<String> pathNodes = reqPath.split('/');
-      List<String> routeNodes = route.split('/');
+      List<String> routeNodes = routePath.split('/');
 
       if (pathNodes.length == routeNodes.length) {
         for (int i = 0; i < pathNodes.length; i++) {
@@ -88,7 +193,7 @@ class Router {
     return matched;
   }
 
-  static bool _matchPathNodeToRouteNode(final String pathNode, final String routeNode) {
+  bool _matchPathNodeToRouteNode(final String pathNode, final String routeNode) {
     bool matched = false;
     if (routeNode.startsWith(':')) {
       matched = true;

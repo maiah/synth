@@ -38,6 +38,9 @@ main() {
   });
 
   route('POST', '/login', (req, res) {
+    print('Haha');
+    return true;
+  }, (req, res) {
     res.write("Hello ${req.dataMap['username']}");
   });
 
@@ -46,5 +49,4 @@ main() {
 
   start(7000);
   print('Listening on port 7000...');
-
 }
