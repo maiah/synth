@@ -58,7 +58,7 @@ Hello, World!
 Adding middleware
 =================
 
-Adding middleware is very simple. It's like providing a HTTP request handler. But you have to register your middleware using the `use` method.
+Adding middleware is very simple. It's like providing a HTTP request handler. But you have to register your middleware thru the `use` method.
 
 Unlike request handler, middlewares must have a `bool` return value. Take a look at the typedef Middleware signature below:
 ```dart
@@ -73,11 +73,29 @@ use((req, res) {
 });
 ```
 
-The code above will register the middleware handler closure you created and will execute everytime a request is processed.
+The code above will register the middleware closure you created and will execute everytime a request is processed.
+
+### Adding middleware into a specific route
+
+Adding middleware into a speficif route is done thru `route` method. The middleware method signature is the same. Add it before the request handler like below.
+```dart
+...
+bool someMiddleware(req, res) {
+  print('Some middleware here.');
+  return true;
+}
+...
+
+route('GET', '/', someMiddleware, (req, res) {
+  res.write('A route with middleware.');
+});
+```
+
+The code above will register and execute the middleware only for this specific route.
 
 ### Built-in middlewares
 
 * `logPath` - Used for logging the Request path and its query parameters.
-* `reqContent` - Used to gather Request POST data and populate `Request`#`dataMap` property which can be accessed by user-defined request handlers.
+* `reqContent` - Used to gather Request POST data and populate `Request`#`dataMap` property which can be accessed by user-defined request handlers and other middlewares.
 
 Synth Robot Boy art by [KabisCube](http://kabiscube.deviantart.com/) `kabiscube@yahoo.com`
