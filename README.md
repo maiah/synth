@@ -77,7 +77,7 @@ The code above will register the middleware closure you created and will execute
 
 ### Adding middleware into a specific route
 
-Adding middleware into a speficif route is done thru `route` method. The middleware method signature is the same. Add it before the request handler like below.
+Adding middleware into a specific route is done thru `route` method. The middleware method signature is the same. Add it before the request handler like below.
 ```dart
 ...
 bool someMiddleware(req, res) {
