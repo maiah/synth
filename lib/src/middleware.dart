@@ -1,6 +1,6 @@
 // Middleware collection.
 
-/** Middleware method signature. */
+/** Middleware handler method signature. */
 typedef void MiddlewareHandler(Request req, Response res, Middleware next);
 
 class Middleware {
