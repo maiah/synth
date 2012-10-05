@@ -1,10 +1,35 @@
 // Middleware collection.
 
 /** Middleware method signature. */
-typedef bool Middleware(Request req, Response res);
+typedef void MiddlewareHandler(Request req, Response res, Middleware next);
 
-/** Middlware for logging request path and its query parameters. */
-bool logPath(Request req, Response res) {
+class Middleware {
+  Request _req;
+  Response _res;
+  MiddlewareHandler _middlewareHandler;
+  Middleware _nextMiddleware;
+  Handler _handler;
+
+  Middleware(this._req, this._res, this._middlewareHandler);
+
+  void set nextMiddleware(Middleware nextMiddleware) {
+    _nextMiddleware = nextMiddleware;
+  }
+
+  void set handler(Handler handler) {
+    _handler = handler;
+  }
+
+  void execute([Error err]) {
+    if (_middlewareHandler != null) {
+      _middlewareHandler(_req, _res, _nextMiddleware);
+    } else {
+      _handler(_req, _res);
+    }
+  }
+}
+
+void logPath(Request req, Response res, Middleware next) {
   final String path = _removeLastForwardSlashFromPath(req.path);
   String params = 'no';
 
@@ -13,14 +38,14 @@ bool logPath(Request req, Response res) {
   }
 
   print('Request path ${path} with $params parameters');
-  return true;
+  next.execute();
 }
 
 /**
  * Middleware for parsing the request post data
  * and making it available in `Request`#`dataMap` property.
  */
-bool reqContent(Request req, Response res) {
+void reqContent(Request req, Response res, Middleware next) {
   final List<int> data = new List<int>();
 
   req.inputStream.onData = () {
@@ -35,7 +60,14 @@ bool reqContent(Request req, Response res) {
       final String val = kvs[1];
       req.dataMap[key] = val;
     }
+    next.execute();
   };
 
-  return true;
+  req.inputStream.onError = (err) {
+    next.execute(err);
+  };
+
+  if ('POST' != req.method) {
+    next.execute();
+  }
 }

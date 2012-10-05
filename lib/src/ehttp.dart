@@ -68,10 +68,10 @@ class Response implements HttpResponse {
   HttpConnectionInfo get connectionInfo => _res.connectionInfo;
 }
 
-/** Enhanced Server object. */
+/** Enhanced Server object. Provides middleware feature. */
 class Server implements HttpServer {
   HttpServer _server;
-  final List<Middleware> _middlewares = new List<Middleware>();
+  final List<MiddlewareHandler> _middlewareHandlers = new List<MiddlewareHandler>();
 
   Server(this._server) {
     _server.defaultRequestHandler = _defaultReqHandler;
@@ -84,44 +84,48 @@ class Server implements HttpServer {
     res.outputStream.close();
   }
 
-  HttpHandler createHandler(Middleware routeMiddleware, Handler handler) {
+  HttpHandler createHandler(Handler handler) {
     return (final HttpRequest req, final HttpResponse res) {
       // Create enhanced Request and Response object.
       final Request synthReq = new Request(req);
       final Response synthRes = new Response(res);
 
-
-      // Execute middlewares if any.
-      bool executeNext = false;
-      for (Middleware middleware in _middlewares) {
-        executeNext = middleware(synthReq, synthRes);
-        if (!executeNext) {
-          break;
-        }
-      }
-
+      // Prepare closing of streams.
       synthReq.inputStream.onClosed = () {
-        // Execute route middleware.
-        if (executeNext && routeMiddleware != null) {
-          executeNext = routeMiddleware(synthReq, synthRes);
-        }
-
-        // Finally execute user handler.
-        if (executeNext) {
-          handler(synthReq, synthRes);
-        }
-
         // Close response stream if needed.
         if (!synthRes.outputStream.closed) {
           synthRes.outputStream.close();
         }
       };
 
+      // Stack the middlewares.
+      if (_middlewareHandlers.length > 0) {
+        Middleware middleware = new Middleware(synthReq, synthRes, _middlewareHandlers[0]);
+        Middleware firstMiddlewareExecution = middleware;
+
+        for (int i = 1; i < _middlewareHandlers.length; i++) {
+          Middleware nextMiddleware = new Middleware(synthReq, synthRes, _middlewareHandlers[i]);
+          middleware.nextMiddleware = nextMiddleware;
+          middleware = nextMiddleware;
+        }
+
+        // Create middleware to execute user request handler.
+        Middleware userMiddleware = new Middleware(synthReq, synthRes, null);
+        userMiddleware.handler = handler;
+        middleware.nextMiddleware = userMiddleware;
+
+        // Execute middlwares.
+        firstMiddlewareExecution.execute();
+
+      } else {
+        // No middlewares available. Execute user request handler immediately.
+        handler(synthReq, synthRes);
+      }
     };
   }
 
-  void addMiddleware(Middleware middleware) {
-    _middlewares.add(middleware);
+  void addMiddlewareHandler(MiddlewareHandler middlewareHandler) {
+    _middlewareHandlers.add(middlewareHandler);
   }
 
   void listen(String host, int port, [int backlog]) => _server.listen(host, port);
@@ -143,20 +147,18 @@ class Server implements HttpServer {
 class Route {
   String _method;
   String _path;
-  Middleware _middleware;
   Handler _handler;
 
-  Route(this._method, this._path, this._middleware, this._handler);
+  Route(this._method, this._path, this._handler);
 
   String get method => _method;
   String get path => _path;
   Handler get handler => _handler;
-  Middleware get middleware => _middleware;
 }
 
 class Router {
   void addRoute(Server server, Route route) {
-    HttpHandler httpHandler = server.createHandler(route.middleware, route.handler);
+    HttpHandler httpHandler = server.createHandler(route.handler);
     server.addRequestHandler((HttpRequest req) {
       return _matchPathToRoute(req, route);
     }, httpHandler);

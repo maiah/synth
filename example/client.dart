@@ -1,11 +1,12 @@
 #import('../lib/synth.dart');
 
 main() {
-
-  use((req, res) {
-    print('This is a middleware.');
-    return true;
+  use((req, res, next) {
+    print('Midi player...');
+    next.execute();
   });
+
+  use(logPath);
 
   use(reqContent);
 
@@ -38,9 +39,6 @@ main() {
   });
 
   route('POST', '/login', (req, res) {
-    print('Haha');
-    return true;
-  }, (req, res) {
     res.write("Hello ${req.dataMap['username']}");
   });
 
