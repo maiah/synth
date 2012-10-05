@@ -60,16 +60,16 @@ Adding middleware
 
 Adding middleware is very simple. It's like providing a HTTP request handler. But you have to register your middleware thru the `use` method.
 
-Unlike request handler, middlewares must have a `bool` return value. Take a look at the typedef Middleware signature below:
+Unlike request handler, middlewares has a 3rd parameter `next` that can be executed to call the next middleware in the stack. Take a look at the typedef MiddlewareHandler signature below:
 ```dart
-typedef bool Middleware(Request req, Response res);
+typedef bool MiddlewareHandler(Request req, Response res, Middleware next);
 ```
 
 For example you want to add a middleware that will log the request path each time a request is processed.
 ```dart
-use((req, res) {
+use((req, res, next) {
   print('Request path is ${req.path}');
-  return true;
+  next.execute(); // Executes the next middleware in the stack.
 });
 ```
 
@@ -80,9 +80,9 @@ The code above will register the middleware closure you created and will execute
 Adding middleware into a specific route is done thru `route` method. The middleware method signature is the same. Add it before the request handler like below.
 ```dart
 ...
-bool someMiddleware(req, res) {
+bool someMiddleware(req, res, next) {
   print('Some middleware here.');
-  return true;
+  next.execute();
 }
 ...
 
