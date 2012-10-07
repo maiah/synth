@@ -13,9 +13,14 @@ const String HOST = '127.0.0.1';
 final Server _server = new Server(new HttpServer());
 final Router _router = new Router();
 
-void route(final String method, final String path, Handler handler) {
+void route(final String method, final String path, middleware,
+           [Handler handler]) {
+  if (handler == null) {
+    handler = middleware;
+    middleware = null;
+  }
 
-  _router.addRoute(_server, new Route(method, path, handler));
+  _router.addRoute(_server, new Route(method, path, middleware, handler));
 }
 
 void start(final int port) {

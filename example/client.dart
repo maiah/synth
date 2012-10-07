@@ -43,7 +43,12 @@ main() {
     res.write("Hello ${req.dataMap['username']}");
   });
 
-  route('GET', '/hello', (req, res)
+  var consoleGreeter = (req, res, next) {
+    print('Hello, World!');
+    next();
+  };
+
+  route('GET', '/hello', consoleGreeter, (req, res)
       => res.write('Hello, World!'));
 
   start(7000);

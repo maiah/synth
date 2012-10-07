@@ -84,7 +84,7 @@ class Server implements HttpServer {
     res.outputStream.close();
   }
 
-  HttpHandler createHandler(Handler handler) {
+  HttpHandler createHandler(Middleware routeMiddleware, Handler handler) {
     return (final HttpRequest req, final HttpResponse res) {
       // Create enhanced Request and Response object.
       final Request synthReq = new Request(req);
@@ -98,21 +98,28 @@ class Server implements HttpServer {
         }
       };
 
+      // Add the user specific route middleware if available.
+      List<Middleware> middlewares = new List<Middleware>();
+      middlewares.addAll(_middlewares);
+      if (routeMiddleware != null) {
+        middlewares.add(routeMiddleware);
+      }
+
       // Stack the middlewares.
-      if (_middlewares.length > 0) {
+      if (middlewares.length > 0) {
         var userRequestHandler = ([Error err]) {
           handler(synthReq, synthRes);
         };
 
         var middleware = ([Error err]) {
-          _middlewares[_middlewares.length - 1](synthReq, synthRes, userRequestHandler);
+          middlewares[middlewares.length - 1](synthReq, synthRes, userRequestHandler);
         };
 
-        if (_middlewares.length > 1) {
-          for (int i = (_middlewares.length - 2); i >= 0; i--) {
+        if (middlewares.length > 1) {
+          for (int i = (middlewares.length - 2); i >= 0; i--) {
             var copyMiddleware = middleware;
             var nextUpMiddleware = ([Error err]) {
-              _middlewares[i](synthReq, synthRes, copyMiddleware);
+              middlewares[i](synthReq, synthRes, copyMiddleware);
             };
             middleware = nextUpMiddleware;
           }
@@ -150,18 +157,20 @@ class Server implements HttpServer {
 class Route {
   String _method;
   String _path;
+  Middleware _middleware;
   Handler _handler;
 
-  Route(this._method, this._path, this._handler);
+  Route(this._method, this._path, this._middleware, this._handler);
 
   String get method => _method;
   String get path => _path;
+  Middleware get middleware => _middleware;
   Handler get handler => _handler;
 }
 
 class Router {
   void addRoute(Server server, Route route) {
-    HttpHandler httpHandler = server.createHandler(route.handler);
+    HttpHandler httpHandler = server.createHandler(route.middleware, route.handler);
     server.addRequestHandler((HttpRequest req) {
       return _matchPathToRoute(req, route);
     }, httpHandler);
