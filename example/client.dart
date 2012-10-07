@@ -3,7 +3,7 @@
 main() {
   use((req, res, next) {
     print('Midi player...');
-    next.execute();
+    next();
   });
 
   use(logPath);
@@ -39,6 +39,7 @@ main() {
   });
 
   route('POST', '/login', (req, res) {
+    print('posting login.');
     res.write("Hello ${req.dataMap['username']}");
   });
 

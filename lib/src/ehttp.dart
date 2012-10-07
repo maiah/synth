@@ -68,10 +68,10 @@ class Response implements HttpResponse {
   HttpConnectionInfo get connectionInfo => _res.connectionInfo;
 }
 
-/** Enhanced Server object. Provides middleware feature. */
+/** Enhanced Server object. Provides middleware server. */
 class Server implements HttpServer {
   HttpServer _server;
-  final List<MiddlewareHandler> _middlewareHandlers = new List<MiddlewareHandler>();
+  final List<Middleware> _middlewares = new List<Middleware>();
 
   Server(this._server) {
     _server.defaultRequestHandler = _defaultReqHandler;
@@ -99,23 +99,26 @@ class Server implements HttpServer {
       };
 
       // Stack the middlewares.
-      if (_middlewareHandlers.length > 0) {
-        Middleware middleware = new Middleware(synthReq, synthRes, _middlewareHandlers[0]);
-        Middleware firstMiddlewareExecution = middleware;
+      if (_middlewares.length > 0) {
+        var userRequestHandler = ([Error err]) {
+          handler(synthReq, synthRes);
+        };
 
-        for (int i = 1; i < _middlewareHandlers.length; i++) {
-          Middleware nextMiddleware = new Middleware(synthReq, synthRes, _middlewareHandlers[i]);
-          middleware.nextMiddleware = nextMiddleware;
-          middleware = nextMiddleware;
+        var middleware = ([Error err]) {
+          _middlewares[_middlewares.length - 1](synthReq, synthRes, userRequestHandler);
+        };
+
+        if (_middlewares.length > 1) {
+          for (int i = (_middlewares.length - 2); i >= 0; i--) {
+            var copyMiddleware = middleware;
+            var nextUpMiddleware = ([Error err]) {
+              _middlewares[i](synthReq, synthRes, copyMiddleware);
+            };
+            middleware = nextUpMiddleware;
+          }
         }
 
-        // Create middleware to execute user request handler.
-        Middleware userMiddleware = new Middleware(synthReq, synthRes, null);
-        userMiddleware.handler = handler;
-        middleware.nextMiddleware = userMiddleware;
-
-        // Execute middlwares.
-        firstMiddlewareExecution.execute();
+        middleware();
 
       } else {
         // No middlewares available. Execute user request handler immediately.
@@ -124,8 +127,8 @@ class Server implements HttpServer {
     };
   }
 
-  void addMiddlewareHandler(MiddlewareHandler middlewareHandler) {
-    _middlewareHandlers.add(middlewareHandler);
+  void addMiddleware(Middleware middleware) {
+    _middlewares.add(middleware);
   }
 
   void listen(String host, int port, [int backlog]) => _server.listen(host, port);

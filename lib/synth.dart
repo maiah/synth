@@ -22,6 +22,6 @@ void start(final int port) {
   _server.listen(HOST, port);
 }
 
-void use(final MiddlewareHandler middlewareHandler) {
-  _server.addMiddlewareHandler(middlewareHandler);
+void use(final Middleware middleware) {
+  _server.addMiddleware(middleware);
 }
