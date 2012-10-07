@@ -62,7 +62,7 @@ Adding middleware is very simple. It's like providing a HTTP request handler. Bu
 
 Unlike request handler, middlewares has a 3rd parameter `next` that can be executed to call the next middleware in the stack. Take a look at the typedef `MiddlewareHandler` signature below:
 ```dart
-typedef bool MiddlewareHandler(Request req, Response res, Middleware next);
+typedef bool MiddlewareHandler(Request req, Response res, next);
 ```
 
 For example you want to add a middleware that will log the request path each time a request is processed.
