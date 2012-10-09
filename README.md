@@ -55,6 +55,25 @@ Step 7: Open your web browser and go to [http://localhost:7000](http://localhost
 Hello, World!
 ```
 
+Routing
+=======
+
+You can register a route with a path that holds a variable like below.
+```dart
+route('GET', '/person/:name', (req, res)
+  => res.write('Hi there.'));
+```
+
+Then you can access this route with [http://localhost:7000/person/maiah](http://localhost:7000/person/maiah) URL.
+
+You can also have multiple variable in a single route path.
+```dart
+route('GET', '/person/:name/department/:id', (req, res)
+  => res.write('Hello there.'));
+```
+
+Then you can access this route with [http://localhost:7000/person/maiah/department/557](http://localhost:7000/person/maiah/department/557) URL.
+
 Adding middleware
 =================
 
