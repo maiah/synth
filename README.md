@@ -69,7 +69,7 @@ For example you want to add a middleware that will log the request path each tim
 ```dart
 use((req, res, next) {
   print('Request path is ${req.path}');
-  next(); // Executes the next middleware in the stack.
+  next(); // Executes the next middleware in the stack if any.
 });
 ```
 
