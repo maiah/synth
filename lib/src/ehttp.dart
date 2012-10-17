@@ -10,6 +10,7 @@ typedef void Handler(Request req, Response res);
 class Request implements HttpRequest {
   final HttpRequest _req;
   final Map<String, String> _dataMap = new Map<String, String>();
+  Object dataObj = null;
 
   Request(this._req);
 
