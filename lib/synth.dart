@@ -1,6 +1,7 @@
 #library('synth');
 
 #import('dart:io');
+#import('dart:json');
 
 #source('src/utils.dart');
 #source('src/middleware.dart');
