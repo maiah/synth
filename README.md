@@ -81,7 +81,7 @@ Adding middleware is very simple. It's like providing a HTTP request handler. Bu
 
 Unlike request handler, middlewares has a 3rd parameter `next` that can be executed to call the next middleware in the stack. Take a look at the typedef `Middleware` signature below:
 ```dart
-typedef bool Middleware(Request req, Response res, next);
+typedef void Middleware(Request req, Response res, next);
 ```
 
 For example you want to add a middleware that will log the request path each time a request is processed.
@@ -116,5 +116,6 @@ The code above will register and execute the middleware only for this specific r
 
 * [logPath](https://github.com/maiah/synth/wiki/Middleware-logPath) - Used for logging the request path and its query parameters.
 * [reqContent](https://github.com/maiah/synth/wiki/Middleware-reqContent) - Used to gather request POST data and populate `Request`#`dataMap` property which can be accessed by user-defined request handlers and other middlewares.
+* [reqJsonContent](https://github.com/maiah/synth/wiki/Middleware-reqJsonContent) - Similar to `reqContent`, except it parses JSON POST data and populates `Request`#`dataObj`.
 
 Synth Robot Boy art by [KabisCube](http://kabiscube.deviantart.com/) `kabiscube@yahoo.com`
