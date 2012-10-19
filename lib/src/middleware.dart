@@ -30,6 +30,7 @@ void reqContent(Request req, Response res, next) {
       final String val = kvs[1];
       req.dataMap[key] = val;
     }
+    req.dataObj = req.dataMap;
     next();
   };
 
@@ -38,6 +39,25 @@ void reqContent(Request req, Response res, next) {
   };
 
   if ('POST' != req.method) {
+    next();
+  }
+}
+
+void reqJsonContent(Request req, Response res, next) {
+  final List<int> data = new List<int>();
+
+  req.inputStream.onData = () {
+    data.addAll(req.inputStream.read());
+    String dataString = new String.fromCharCodes(data);
+    req.dataObj = JSON.parse(dataString);
+    next();
+  };
+
+  req.inputStream.onError = (err) {
+    next(err);
+  };
+
+  if ('POST' != req.method || req.headers.contentType.subType != 'json') {
     next();
   }
 }
