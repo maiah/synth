@@ -1,4 +1,4 @@
-#import('../lib/synth.dart');
+import '../lib/synth.dart';
 
 main() {
   bool isMatched = Router.matchPathToRoute('GET', '/', 'GET', '/');

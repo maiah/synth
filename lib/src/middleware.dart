@@ -1,4 +1,5 @@
 // Middleware collection.
+part of synth;
 
 /** Middleware handler method signature. */
 typedef void Middleware(Request req, Response res, next);

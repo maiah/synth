@@ -1,11 +1,11 @@
-#library('synth');
+library synth;
 
-#import('dart:io');
-#import('dart:json');
+import 'dart:io';
+import 'dart:json';
 
-#source('src/utils.dart');
-#source('src/middleware.dart');
-#source('src/ehttp.dart');
+part 'src/utils.dart';
+part 'src/middleware.dart';
+part 'src/ehttp.dart';
 
 // Constants
 const String HOST = '127.0.0.1';

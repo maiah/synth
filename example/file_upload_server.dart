@@ -1,4 +1,4 @@
-#import('../lib/synth.dart');
+import '../lib/synth.dart';
 
 main() {
   route('GET', '/upload', (req, res) {
@@ -34,6 +34,11 @@ main() {
       String contentDisposition = contents[1];
       String contentType = contents[2];
 
+      List<String> haha = dataString.split(webKitFormBoundary);
+      for (String h in haha) {
+        print('${haha[1]}');
+      }
+
       String fileBody = '';
       for (int i = 4; i < (contents.length - 2); i++) {
         String content = contents[i];
@@ -42,7 +47,6 @@ main() {
         }
       }
 
-      print(webKitFormBoundary);
       res.write(dataString);
       res.outputStream.close();
     };

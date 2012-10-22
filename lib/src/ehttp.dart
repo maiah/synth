@@ -1,4 +1,5 @@
 // Enhanced HTTP objects.
+part of synth;
 
 /** Dart's default HTTP handler method signature. */
 typedef void HttpHandler(HttpRequest req, HttpResponse res);
