@@ -31,7 +31,7 @@ $ pub install
 
 Step 4: Create `hello_server.dart` file inside `hello` folder and import `synth.dart` library in that file.
 ```dart
-#import('package:synth/synth.dart');
+import 'package:synth/synth.dart';
 ```
 
 Step 5: And also in this file create `main` method and define your routes and start the `HTTP` server.
