@@ -6,6 +6,7 @@ import 'dart:json';
 part 'src/utils.dart';
 part 'src/middleware.dart';
 part 'src/ehttp.dart';
+part 'src/render.dart';
 
 // Private variables
 final Server _server = new Server(new HttpServer());
