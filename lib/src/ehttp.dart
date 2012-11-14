@@ -69,6 +69,11 @@ class Response implements HttpResponse {
   OutputStream get outputStream => _res.outputStream;
   DetachedSocket detachSocket() => _res.detachSocket();
   HttpConnectionInfo get connectionInfo => _res.connectionInfo;
+  
+  void render( String template ) {
+    Render render = new Render( template );
+    this.write( render.render() );
+  }
 }
 
 /** Enhanced Server object. Provides middleware server. */
