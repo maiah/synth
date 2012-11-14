@@ -34,6 +34,7 @@ class Request implements HttpRequest {
   InputStream get inputStream => _req.inputStream;
   String get protocolVersion => _req.protocolVersion;
   HttpConnectionInfo get connectionInfo => _req.connectionInfo;
+  HttpSession session([init(HttpSession session)]) => _req.session(init);
 }
 
 /** Enahnced Response object. */
@@ -44,7 +45,7 @@ class Response implements HttpResponse {
 
   /** Convenient method for writing content in the `Response`#`outputStream`. */
   void write(String content) {
-    outputStream.write(content.charCodes());
+    outputStream.write(content.charCodes);
   }
 
   int get contentLength => _res.contentLength;
@@ -82,7 +83,7 @@ class Server implements HttpServer {
   void _defaultReqHandler(final HttpRequest req, final HttpResponse res) {
     res.statusCode = HttpStatus.NOT_FOUND;
     res.headers.set(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
-    res.outputStream.write('${res.statusCode} Page not found.'.charCodes());
+    res.outputStream.write('${res.statusCode} Page not found.'.charCodes);
     res.outputStream.close();
   }
 
@@ -140,7 +141,7 @@ class Server implements HttpServer {
     _middlewares.add(middleware);
   }
 
-  void listen(String host, int port, [int backlog]) => _server.listen(host, port);
+  void listen(String host, int port, {int backlog: 128}) => _server.listen(host, port);
   void listenOn(ServerSocket serverSocket) => _server.listenOn(serverSocket);
   addRequestHandler(bool matcher(HttpRequest request),
                     void handler(HttpRequest request, HttpResponse response))
@@ -153,6 +154,10 @@ class Server implements HttpServer {
   int get port => _server.port;
   void set onError(void callback(e)) {
     _server.onError = callback;
+  }
+
+  void set sessionTimeout(int timeout) {
+    _server.sessionTimeout = timeout;
   }
 }
 
