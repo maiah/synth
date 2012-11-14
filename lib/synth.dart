@@ -6,9 +6,7 @@ import 'dart:json';
 part 'src/utils.dart';
 part 'src/middleware.dart';
 part 'src/ehttp.dart';
-
-// Constants
-const String HOST = '127.0.0.1';
+part 'src/render.dart';
 
 // Private variables
 final Server _server = new Server(new HttpServer());
@@ -24,8 +22,8 @@ void route(final String method, final String path, middleware,
   _router.addRoute(_server, new Route(method, path, middleware, handler));
 }
 
-void start(final int port) {
-  _server.listen(HOST, port);
+void start({int port: 7000, String host: '127.0.0.1'}) {
+  _server.listen(host, port);
 }
 
 void use(final Middleware middleware) {
