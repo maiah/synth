@@ -40,7 +40,7 @@ main () {
   route('GET', '/', (req, res)
     => res.write('Hello, World!'));
 
-  start(7000);
+  start(port: 7000);
   print('Listening on port 7000');
 }
 ```
