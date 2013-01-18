@@ -79,13 +79,27 @@ class Response implements HttpResponse {
 /** Enhanced Server object. Provides middleware server. */
 class Server implements HttpServer {
   HttpServer _server;
+  String _webRoot;
   final List<Middleware> _middlewares = new List<Middleware>();
 
-  Server(this._server) {
+  Server(this._server, this._webRoot) {
     _server.defaultRequestHandler = _defaultReqHandler;
   }
 
   void _defaultReqHandler(final HttpRequest req, final HttpResponse res) {
+    final String path = req.path == '/' ? '/index.html' : req.path;
+    final File file = new File('${_webRoot}${path}');    
+    file.exists().then((bool found) {
+      if (found) {
+        file.openInputStream().pipe(res.outputStream);      
+      } else {
+        print('"Requested file ${_webRoot}${path} not found');
+        _send404(res);
+      }
+    });
+  }
+  
+  void _send404(HttpResponse res) {
     res.statusCode = HttpStatus.NOT_FOUND;
     res.headers.set(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
     res.outputStream.write('${res.statusCode} Page not found.'.charCodes);
@@ -146,7 +160,15 @@ class Server implements HttpServer {
     _middlewares.add(middleware);
   }
 
-  void listen(String host, int port, {int backlog: 128}) => _server.listen(host, port);
+  void listen(String host,
+              int port,
+              {int backlog: 128,
+               String certificate_name,
+               bool requestClientCertificate: false}) {
+    listenPort(host, port, backlog: backlog);    
+  }
+  
+  void listenPort(String host, int port, {int backlog: 128}) => _server.listen(host, port, backlog: backlog);
   void listenOn(ServerSocket serverSocket) => _server.listenOn(serverSocket);
   addRequestHandler(bool matcher(HttpRequest request),
                     void handler(HttpRequest request, HttpResponse response))
