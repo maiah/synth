@@ -88,7 +88,6 @@ class Server implements HttpServer {
 
   void _defaultReqHandler(final HttpRequest req, final HttpResponse res) {
     final String path = req.path == '/' ? '/index.html' : req.path;
-    print('reg: ${req.path} | Path: ${path}');
     final File file = new File('${_webRoot}${path}');    
     file.exists().then((bool found) {
       if (found) {
@@ -166,10 +165,7 @@ class Server implements HttpServer {
               {int backlog: 128,
                String certificate_name,
                bool requestClientCertificate: false}) {
-    listenPort(host, port, backlog: backlog);
-    
-    print(backlog);
-    print(certificate_name);
+    listenPort(host, port, backlog: backlog);    
   }
   
   void listenPort(String host, int port, {int backlog: 128}) => _server.listen(host, port, backlog: backlog);
